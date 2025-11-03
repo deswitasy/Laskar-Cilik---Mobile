@@ -18,13 +18,10 @@ Manajemen Data Siswa
 Pencatatan informasi siswa secara lengkap, terstruktur, dan mudah diakses.
 
 Penilaian Perkembangan
-Input nilai berdasarkan aspek perkembangan sesuai kurikulum TK IT.
+Input predikat berdasarkan aspek perkembangan sesuai kurikulum TK IT.
 
 Laporan Akademik
 Rekap laporan perkembangan siswa untuk kebutuhan evaluasi.
-
-Dashboard Informasi
-Ringkasan data utama yang membantu guru memonitor perkembangan siswa dengan cepat.
 
 🧑‍🏫 Manfaat
 
