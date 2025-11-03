@@ -4,7 +4,6 @@ import '../models/student_model.dart';
 import 'dart:math';
 import 'package:intl/date_symbol_data_local.dart';
 
-
 class AddStudentScreen extends StatefulWidget {
   final Student? student; // kalau ada -> edit
 
@@ -22,8 +21,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final _semester = TextEditingController();
   DateTime _tahun = DateTime.now();
 
-  final _nilaiAjaran = TextEditingController();
-  final _descAjaran = TextEditingController();
+  final _nilaiAgama = TextEditingController();
+  final _descAgama = TextEditingController();
 
   final _nilaiJatiDiri = TextEditingController();
   final _descJatiDiri = TextEditingController();
@@ -31,13 +30,13 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final _nilaiSTEM = TextEditingController();
   final _descSTEM = TextEditingController();
 
-  final _nilaiManasik = TextEditingController();
-  final _descManasik = TextEditingController();
+  final _nilaiPancasila = TextEditingController();
+  final _descPancasila = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-  initializeDateFormatting('id_ID', null);
+    initializeDateFormatting('id_ID', null);
     final s = widget.student;
     if (s != null) {
       _nama.text = s.nama;
@@ -49,14 +48,14 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       } catch (_) {
         _tahun = DateTime.now();
       }
-      _nilaiAjaran.text = s.nilaiAjaran;
-      _descAjaran.text = s.deskripsiAjaran;
+      _nilaiAgama.text = s.nilaiAgama;
+      _descAgama.text = s.deskripsiAgama;
       _nilaiJatiDiri.text = s.nilaiJatiDiri;
       _descJatiDiri.text = s.deskripsiJatiDiri;
       _nilaiSTEM.text = s.nilaiSTEM;
       _descSTEM.text = s.deskripsiSTEM;
-      _nilaiManasik.text = s.nilaiManasik;
-      _descManasik.text = s.deskripsiManasik;
+      _nilaiPancasila.text = s.nilaiPancasila;
+      _descPancasila.text = s.deskripsiPancasila;
     }
   }
 
@@ -80,14 +79,14 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       kelas: _kelas,
       semester: int.tryParse(_semester.text) ?? 1,
       tahunAjaran: DateFormat('dd/MM/yyyy').format(_tahun),
-      nilaiAjaran: _nilaiAjaran.text.trim(),
-      deskripsiAjaran: _descAjaran.text.trim(),
+      nilaiAgama: _nilaiAgama.text.trim(),
+      deskripsiAgama: _descAgama.text.trim(),
       nilaiJatiDiri: _nilaiJatiDiri.text.trim(),
       deskripsiJatiDiri: _descJatiDiri.text.trim(),
       nilaiSTEM: _nilaiSTEM.text.trim(),
       deskripsiSTEM: _descSTEM.text.trim(),
-      nilaiManasik: _nilaiManasik.text.trim(),
-      deskripsiManasik: _descManasik.text.trim(),
+      nilaiPancasila: _nilaiPancasila.text.trim(),
+      deskripsiPancasila: _descPancasila.text.trim(),
     );
 
     Navigator.pop(context, st);
@@ -108,27 +107,34 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               TextFormField(
                 controller: _nama,
                 decoration: const InputDecoration(labelText: 'Nama Lengkap'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Isi nama' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Isi nama' : null,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _kelas,
+                initialValue: _kelas, // ganti dari 'value' ke 'initialValue'
                 decoration: const InputDecoration(labelText: 'Kelas'),
-                items: ['A', 'B', 'C'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                items: ['A', 'B', 'C']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
                 onChanged: (v) => setState(() => _kelas = v ?? 'A'),
               ),
+
               const SizedBox(height: 12),
               TextFormField(
                 controller: _semester,
                 decoration: const InputDecoration(labelText: 'Semester'),
                 keyboardType: TextInputType.number,
-                validator: (v) => (v == null || v.isEmpty) ? 'Isi semester' : null,
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Isi semester' : null,
               ),
               const SizedBox(height: 12),
               InkWell(
                 onTap: _pickDate,
                 child: InputDecorator(
-                  decoration: const InputDecoration(labelText: 'Tahun Ajaran (pilih tanggal)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Tahun Ajaran (pilih tanggal)',
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -140,15 +146,18 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               ),
               const SizedBox(height: 14),
 
+              Text('Predikat'),
               // Nilai Ajaran
               TextFormField(
-                controller: _nilaiAjaran,
-                decoration: const InputDecoration(labelText: 'Predikat Ajaran'),
+                controller: _nilaiAgama,
+                decoration: const InputDecoration(labelText: 'Agama'),
               ),
               const SizedBox(height: 8),
               TextFormField(
-                controller: _descAjaran,
-                decoration: const InputDecoration(labelText: 'Deskripsi Ajaran'),
+                controller: _descAgama,
+                decoration: const InputDecoration(
+                  labelText: 'Deskripsi',
+                ),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
@@ -156,12 +165,16 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               // Jati Diri
               TextFormField(
                 controller: _nilaiJatiDiri,
-                decoration: const InputDecoration(labelText: 'Predikat Jati Diri'),
+                decoration: const InputDecoration(
+                  labelText: 'Jati Diri',
+                ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _descJatiDiri,
-                decoration: const InputDecoration(labelText: 'Deskripsi Jati Diri'),
+                decoration: const InputDecoration(
+                  labelText: 'Deskripsi',
+                ),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
@@ -169,7 +182,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               // STEM
               TextFormField(
                 controller: _nilaiSTEM,
-                decoration: const InputDecoration(labelText: 'Predikat STEM'),
+                decoration: const InputDecoration(labelText: 'STEM'),
               ),
               const SizedBox(height: 8),
               TextFormField(
@@ -181,13 +194,17 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
               // Manasik
               TextFormField(
-                controller: _nilaiManasik,
-                decoration: const InputDecoration(labelText: 'Predikat Manasik'),
+                controller: _nilaiPancasila,
+                decoration: const InputDecoration(
+                  labelText: 'Pancasila',
+                ),
               ),
               const SizedBox(height: 8),
               TextFormField(
-                controller: _descManasik,
-                decoration: const InputDecoration(labelText: 'Deskripsi Manasik'),
+                controller: _descPancasila,
+                decoration: const InputDecoration(
+                  labelText: 'Deskripsi',
+                ),
                 maxLines: 2,
               ),
 

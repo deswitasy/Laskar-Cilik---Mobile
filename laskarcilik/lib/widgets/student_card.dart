@@ -28,7 +28,7 @@ class StudentCard extends StatelessWidget {
         ),
         subtitle: Text(
           'Kelas ${student.kelas} | Semester ${student.semester}\n'
-          'Nilai Ajaran: ${student.nilaiAjaran}',
+         
         ),
         isThreeLine: true,
         trailing: Wrap(

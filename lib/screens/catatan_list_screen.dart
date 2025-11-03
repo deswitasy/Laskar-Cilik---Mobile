@@ -20,7 +20,7 @@ class CatatanListScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
-              color: AppTheme.lightBlue.withOpacity(0.3),
+              color: AppTheme.lightBlue.withValues(alpha: 0.3),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -72,8 +72,8 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Nilai Ajaran ===
-                      _buildDetailRow('Nilai Ajaran', student.nilaiAjaran,
+                      // === Ajaran ===
+                      _buildDetailRow('Agama', student.nilaiAgama,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
                       const Text(
@@ -84,7 +84,7 @@ class CatatanListScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        student.deskripsiAjaran,
+                        student.deskripsiAgama,
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontSize: 13,
@@ -93,8 +93,8 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Nilai STEM ===
-                      _buildDetailRow('Nilai STEM', student.nilaiSTEM,
+                      // === STEM ===
+                      _buildDetailRow('STEM', student.nilaiSTEM,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
                       const Text(
@@ -114,8 +114,8 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Nilai Manasik ===
-                      _buildDetailRow('Nilai Manasik', student.nilaiManasik,
+                      // === Manasik ===
+                      _buildDetailRow('Manasik', student.nilaiPancasila,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
                       const Text(
@@ -126,7 +126,7 @@ class CatatanListScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        student.deskripsiManasik,
+                        student.deskripsiPancasila,
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontSize: 13,
@@ -135,8 +135,8 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Nilai Jati Diri ===
-                      _buildDetailRow('Nilai Jati Diri', student.nilaiJatiDiri,
+                      // === Jati Diri ===
+                      _buildDetailRow('Jati Diri', student.nilaiJatiDiri,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
                       const Text(

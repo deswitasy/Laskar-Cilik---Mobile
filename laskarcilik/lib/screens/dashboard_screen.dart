@@ -30,14 +30,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         kelas: ['A', 'A', 'B', 'B'][i],
         semester: 1,
         tahunAjaran: '2024/2025',
-        nilaiAjaran: 'Baik',
-        deskripsiAjaran: 'Perkembangan baik.',
+        nilaiAgama: 'Baik',
+        deskripsiAgama: 'Perkembangan baik.',
         nilaiJatiDiri: 'Baik',
         deskripsiJatiDiri: 'Sopan dan tanggung jawab.',
         nilaiSTEM: 'Baik',
         deskripsiSTEM: 'Terampil di sains.',
-        nilaiManasik: 'Cukup',
-        deskripsiManasik: 'Perlu perbaikan.',
+        nilaiPancasila: 'Cukup',
+        deskripsiPancasila: 'Perlu perbaikan.',
       );
     });
     filtered = List.from(students);
@@ -46,8 +46,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _onSearch(String q) {
     final s = q.toLowerCase();
     setState(() {
-      if (s.isEmpty) filtered = List.from(students);
-      else filtered = students.where((st) => st.nama.toLowerCase().contains(s)).toList();
+      if (s.isEmpty) {
+        filtered = List.from(students);
+      } else {
+        filtered = students
+            .where((st) => st.nama.toLowerCase().contains(s))
+            .toList();
+      }
     });
   }
 
@@ -79,10 +84,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _removeStudent(int index) {
     final removed = students.removeAt(index);
-    setState(() { filtered = List.from(students); });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Terhapus: ${removed.nama}')),
-    );
+    setState(() {
+      filtered = List.from(students);
+    });
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Terhapus: ${removed.nama}')));
   }
 
   void _printAll() async {
@@ -126,8 +133,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: _goToAdd,
-                  icon: const Icon(Icons.add, color: Colors.white,),
-                  label: const Text('Tambah', style: TextStyle(color: Colors.white),),
+                  icon: const Icon(Icons.add, color: Colors.white),
+                  label: const Text(
+                    'Tambah',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -138,7 +148,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text('Jumlah: ${filtered.length}'),
                 const Spacer(),
-                Text('Tanggal: $dt', style: TextStyle(color: Colors.grey.shade600)),
+                Text(
+                  'Tanggal: $dt',
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
               ],
             ),
           ),
@@ -150,13 +163,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     itemCount: filtered.length,
                     itemBuilder: (context, idx) {
                       final s = filtered[idx];
-                      final origIndex = students.indexWhere((e) => e.id == s.id);
+                      final origIndex = students.indexWhere(
+                        (e) => e.id == s.id,
+                      );
                       return StudentCard(
                         student: s,
                         onDetail: () => _openDetail(s),
-                        onEdit: () => _editStudent(s, origIndex < 0 ? idx : origIndex),
-                        onDelete: () => _confirmDelete(origIndex < 0 ? idx : origIndex),
-                        
+                        onEdit: () =>
+                            _editStudent(s, origIndex < 0 ? idx : origIndex),
+                        onDelete: () =>
+                            _confirmDelete(origIndex < 0 ? idx : origIndex),
                       );
                     },
                   ),
@@ -173,18 +189,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: const Text('Hapus Data'),
         content: const Text('Yakin ingin menghapus data Catatan?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              _removeStudent(index);
-            },
-            child: const Text('Hapus', style: TextStyle(color: Colors.white),),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.dangerRed),
-          )
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.dangerRed,
+            ),
+            onPressed: () => _removeStudent(index), // panggil fungsinya di sini
+            child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+          ),
         ],
       ),
     );
   }
-  
 }
