@@ -103,6 +103,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // fungsi logout
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Konfirmasi Logout'),
+        content: const Text('Yakin ingin keluar dari akun ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx); // tutup dialog
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white),),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dt = DateFormat('dd/MM/yyyy').format(DateTime.now());
@@ -110,7 +134,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Catatan Perkembangan Siswa'),
         actions: [
-          IconButton(onPressed: _printAll, icon: const Icon(Icons.print)),
+          IconButton(
+            onPressed: _printAll,
+            icon: const Icon(Icons.print),
+            tooltip: 'Cetak Data',
+          ),
+          IconButton(
+            onPressed: _logout,
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+          ),
           const SizedBox(width: 6),
         ],
       ),
@@ -197,7 +230,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.dangerRed,
             ),
-            onPressed: () => _removeStudent(index), // panggil fungsinya di sini
+            onPressed: () => _removeStudent(index),
             child: const Text('Hapus', style: TextStyle(color: Colors.white)),
           ),
         ],
