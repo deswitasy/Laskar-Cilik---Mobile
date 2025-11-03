@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:intl/date_symbol_data_local.dart';
 
 class AddStudentScreen extends StatefulWidget {
-  final Student? student; // kalau ada -> edit
+  final Student? student;
 
   const AddStudentScreen({super.key, this.student});
 
@@ -21,17 +21,20 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final _semester = TextEditingController();
   DateTime _tahun = DateTime.now();
 
-  final _nilaiAgama = TextEditingController();
+  // ubah nilai jadi string biasa (karena pakai dropdown)
+  String _nilaiAgama = 'Baik';
   final _descAgama = TextEditingController();
 
-  final _nilaiJatiDiri = TextEditingController();
+  String _nilaiJatiDiri = 'Baik';
   final _descJatiDiri = TextEditingController();
 
-  final _nilaiSTEM = TextEditingController();
+  String _nilaiSTEM = 'Baik';
   final _descSTEM = TextEditingController();
 
-  final _nilaiPancasila = TextEditingController();
+  String _nilaiPancasila = 'Baik';
   final _descPancasila = TextEditingController();
+
+  final _opsiNilai = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang'];
 
   @override
   void initState() {
@@ -43,18 +46,21 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       _kelas = s.kelas;
       _semester.text = s.semester.toString();
       try {
-        // parse tahun if it's dd/MM/yyyy saved
         _tahun = DateFormat('dd/MM/yyyy').parse(s.tahunAjaran);
       } catch (_) {
         _tahun = DateTime.now();
       }
-      _nilaiAgama.text = s.nilaiAgama;
+
+      _nilaiAgama = s.nilaiAgama.isNotEmpty ? s.nilaiAgama : 'Baik';
       _descAgama.text = s.deskripsiAgama;
-      _nilaiJatiDiri.text = s.nilaiJatiDiri;
+
+      _nilaiJatiDiri = s.nilaiJatiDiri.isNotEmpty ? s.nilaiJatiDiri : 'Baik';
       _descJatiDiri.text = s.deskripsiJatiDiri;
-      _nilaiSTEM.text = s.nilaiSTEM;
+
+      _nilaiSTEM = s.nilaiSTEM.isNotEmpty ? s.nilaiSTEM : 'Baik';
       _descSTEM.text = s.deskripsiSTEM;
-      _nilaiPancasila.text = s.nilaiPancasila;
+
+      _nilaiPancasila = s.nilaiPancasila.isNotEmpty ? s.nilaiPancasila : 'Baik';
       _descPancasila.text = s.deskripsiPancasila;
     }
   }
@@ -79,13 +85,13 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       kelas: _kelas,
       semester: int.tryParse(_semester.text) ?? 1,
       tahunAjaran: DateFormat('dd/MM/yyyy').format(_tahun),
-      nilaiAgama: _nilaiAgama.text.trim(),
+      nilaiAgama: _nilaiAgama,
       deskripsiAgama: _descAgama.text.trim(),
-      nilaiJatiDiri: _nilaiJatiDiri.text.trim(),
+      nilaiJatiDiri: _nilaiJatiDiri,
       deskripsiJatiDiri: _descJatiDiri.text.trim(),
-      nilaiSTEM: _nilaiSTEM.text.trim(),
+      nilaiSTEM: _nilaiSTEM,
       deskripsiSTEM: _descSTEM.text.trim(),
-      nilaiPancasila: _nilaiPancasila.text.trim(),
+      nilaiPancasila: _nilaiPancasila,
       deskripsiPancasila: _descPancasila.text.trim(),
     );
 
@@ -95,6 +101,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.student != null;
+
     return Scaffold(
       appBar: AppBar(title: Text(isEdit ? 'Edit Catatan' : 'Tambah Catatan')),
       body: SingleChildScrollView(
@@ -110,23 +117,19 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Isi nama' : null,
               ),
-              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _kelas, // ganti dari 'value' ke 'initialValue'
+                initialValue: _kelas,
                 decoration: const InputDecoration(labelText: 'Kelas'),
                 items: ['A', 'B', 'C']
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (v) => setState(() => _kelas = v ?? 'A'),
               ),
-
               const SizedBox(height: 12),
               TextFormField(
                 controller: _semester,
                 decoration: const InputDecoration(labelText: 'Semester'),
                 keyboardType: TextInputType.number,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Isi semester' : null,
               ),
               const SizedBox(height: 12),
               InkWell(
@@ -138,77 +141,81 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(DateFormat('dd/MM/yyyy').format(_tahun)),
+                      Text(DateFormat('yyyy').format(_tahun)),
                       const Icon(Icons.calendar_today),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
 
-              Text('Predikat'),
-              // Nilai Ajaran
-              TextFormField(
-                controller: _nilaiAgama,
+              const SizedBox(height: 20),
+              const Text('Predikat & Deskripsi'),
+              const Divider(),
+
+              // Agama
+              DropdownButtonFormField<String>(
+                initialValue: _nilaiAgama,
                 decoration: const InputDecoration(labelText: 'Agama'),
+                items: _opsiNilai
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (v) => setState(() => _nilaiAgama = v ?? 'Baik'),
               ),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: _descAgama,
-                decoration: const InputDecoration(
-                  labelText: 'Deskripsi',
-                ),
+                decoration: const InputDecoration(labelText: 'Deskripsi'),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
 
               // Jati Diri
-              TextFormField(
-                controller: _nilaiJatiDiri,
-                decoration: const InputDecoration(
-                  labelText: 'Jati Diri',
-                ),
+              DropdownButtonFormField<String>(
+                initialValue: _nilaiJatiDiri,
+                decoration: const InputDecoration(labelText: 'Jati Diri'),
+                items: _opsiNilai
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (v) => setState(() => _nilaiJatiDiri = v ?? 'Baik'),
               ),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: _descJatiDiri,
-                decoration: const InputDecoration(
-                  labelText: 'Deskripsi',
-                ),
+                decoration: const InputDecoration(labelText: 'Deskripsi'),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
 
               // STEM
-              TextFormField(
-                controller: _nilaiSTEM,
+              DropdownButtonFormField<String>(
+                initialValue: _nilaiSTEM,
                 decoration: const InputDecoration(labelText: 'STEM'),
+                items: _opsiNilai
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (v) => setState(() => _nilaiSTEM = v ?? 'Baik'),
               ),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: _descSTEM,
-                decoration: const InputDecoration(labelText: 'Deskripsi STEM'),
+                decoration: const InputDecoration(labelText: 'Deskripsi'),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
 
-              // Manasik
-              TextFormField(
-                controller: _nilaiPancasila,
-                decoration: const InputDecoration(
-                  labelText: 'Pancasila',
-                ),
+              // Pancasila
+              DropdownButtonFormField<String>(
+                initialValue: _nilaiPancasila,
+                decoration: const InputDecoration(labelText: 'Pancasila'),
+                items: _opsiNilai
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (v) => setState(() => _nilaiPancasila = v ?? 'Baik'),
               ),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: _descPancasila,
-                decoration: const InputDecoration(
-                  labelText: 'Deskripsi',
-                ),
+                decoration: const InputDecoration(labelText: 'Deskripsi'),
                 maxLines: 2,
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
@@ -221,12 +228,16 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _save,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue, // warna tombol
+                        foregroundColor: Colors.white, // warna teks & icon
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
                       child: Text(isEdit ? 'Simpan Perubahan' : 'Simpan'),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
