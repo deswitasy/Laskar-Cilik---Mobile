@@ -4,7 +4,6 @@ import '../models/student_model.dart';
 
 class CatatanListScreen extends StatelessWidget {
   final Student student;
-
   const CatatanListScreen({super.key, required this.student});
 
   @override
@@ -16,7 +15,6 @@ class CatatanListScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header Info
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -72,7 +70,7 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Ajaran ===
+                      // Ajaran
                       _buildDetailRow('Agama', student.nilaiAgama,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
@@ -93,7 +91,6 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === STEM ===
                       _buildDetailRow('STEM', student.nilaiSTEM,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
@@ -114,8 +111,7 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Manasik ===
-                      _buildDetailRow('Manasik', student.nilaiPancasila,
+                      _buildDetailRow('Pancasila', student.nilaiPancasila,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),
                       const Text(
@@ -135,7 +131,7 @@ class CatatanListScreen extends StatelessWidget {
 
                       const Divider(height: 24),
 
-                      // === Jati Diri ===
+                      // Jati Diri
                       _buildDetailRow('Jati Diri', student.nilaiJatiDiri,
                           valueColor: AppTheme.successGreen),
                       const SizedBox(height: 8),

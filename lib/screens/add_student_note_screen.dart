@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import '../models/student_data_model.dart';
 import '../models/student_note_model.dart';
 import '../core/theme.dart';
@@ -29,6 +31,9 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
   String _nilaiPancasila = 'Baik';
   final _descPancasila = TextEditingController();
   final _opsiNilai = ['Sangat Baik', 'Baik', 'Cukup', 'Kurang'];
+  List<String> _fileDokumen = [];
+  List<String> _fileFoto = [];
+  List<String> _fotoKeterangan = [];
 
   @override
   void initState() {
@@ -44,6 +49,13 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
       _descSTEM.text = widget.note!.deskripsiSTEM;
       _nilaiPancasila = widget.note!.nilaiPancasila;
       _descPancasila.text = widget.note!.deskripsiPancasila;
+      _fileDokumen = List.from(widget.note!.fileDokumen);
+      _fileFoto = List.from(widget.note!.fileFoto);
+      _fotoKeterangan = List.from(widget.note!.fotoKeterangan);
+      // Ensure keterangan list matches foto list length
+      while (_fotoKeterangan.length < _fileFoto.length) {
+        _fotoKeterangan.add('');
+      }
     } else {
       if (widget.availableStudents.isNotEmpty) {
         _selectedStudentId = widget.availableStudents[0].id;
@@ -75,9 +87,48 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
       deskripsiSTEM: _descSTEM.text.trim(),
       nilaiPancasila: _nilaiPancasila,
       deskripsiPancasila: _descPancasila.text.trim(),
+      fileDokumen: _fileDokumen,
+      fileFoto: _fileFoto,
+      fotoKeterangan: _fotoKeterangan,
     );
 
     Navigator.pop(context, newNote);
+  }
+
+  Future<void> _pickDocument() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx', 'xlsx', 'xls', 'txt'],
+    );
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        _fileDokumen.add(result.files.first.name);
+      });
+    }
+  }
+
+  Future<void> _pickPhoto() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _fileFoto.add(image.path);
+        _fotoKeterangan.add(''); // Add empty keterangan
+      });
+    }
+  }
+
+  void _removeDocument(int index) {
+    setState(() => _fileDokumen.removeAt(index));
+  }
+
+  void _removePhoto(int index) {
+    setState(() {
+      _fileFoto.removeAt(index);
+      if (index < _fotoKeterangan.length) {
+        _fotoKeterangan.removeAt(index);
+      }
+    });
   }
 
   @override
@@ -85,7 +136,7 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
     final isEdit = widget.note != null;
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit Catatan Siswa' : 'Tambah Catatan Siswa'),
+        title: Text(isEdit ? 'Edit Predikat Siswa' : 'Tambah Catatan Siswa'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -118,7 +169,7 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
             const Divider(),
             const SizedBox(height: 12),
             const Text(
-              'Penilaian',
+              'Predikat Perkembangan Siswa',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -149,6 +200,148 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
               onNilaiChanged: (val) => setState(() => _nilaiPancasila = val),
               desc: _descPancasila,
             ),
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 12),
+            const Text(
+              'Lampiran',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            // Dokumen Section
+            const Text(
+              'Dokumen',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickDocument,
+                    icon: const Icon(Icons.file_present),
+                    label: const Text('Pilih Dokumen'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (_fileDokumen.isNotEmpty)
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _fileDokumen.length,
+                itemBuilder: (context, idx) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.description, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _fileDokumen[idx],
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red),
+                            iconSize: 18,
+                            onPressed: () => _removeDocument(idx),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            const SizedBox(height: 12),
+            // Foto Section
+            const Text(
+              'Foto/Gambar',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickPhoto,
+                    icon: const Icon(Icons.image),
+                    label: const Text('Pilih Foto'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (_fileFoto.isNotEmpty)
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _fileFoto.length,
+                itemBuilder: (context, idx) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.image, color: Colors.green),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _fileFoto[idx].split('/').last,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                iconSize: 18,
+                                onPressed: () => _removePhoto(idx),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            onChanged: (value) {
+                              _fotoKeterangan[idx] = value;
+                            },
+                            initialValue: _fotoKeterangan[idx],
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan keterangan foto...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              isDense: true,
+                            ),
+                            maxLines: 2,
+                            minLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -191,7 +384,7 @@ class _AddStudentNoteScreenState extends State<AddStudentNoteScreen> {
         DropdownButtonFormField<String>(
           value: nilai,
           decoration: const InputDecoration(
-            labelText: 'Nilai',
+            labelText: 'Predikat',
             isDense: true,
           ),
           items: _opsiNilai

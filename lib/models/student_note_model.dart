@@ -10,6 +10,9 @@ class StudentNote {
   final String deskripsiSTEM;
   final String nilaiPancasila;
   final String deskripsiPancasila;
+  final List<String> fileDokumen;
+  final List<String> fileFoto;
+  final List<String> fotoKeterangan;
   final DateTime createdAt;
 
   StudentNote({
@@ -24,6 +27,9 @@ class StudentNote {
     required this.deskripsiSTEM,
     required this.nilaiPancasila,
     required this.deskripsiPancasila,
+    this.fileDokumen = const [],
+    this.fileFoto = const [],
+    this.fotoKeterangan = const [],
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -39,6 +45,9 @@ class StudentNote {
     String? deskripsiSTEM,
     String? nilaiPancasila,
     String? deskripsiPancasila,
+    List<String>? fileDokumen,
+    List<String>? fileFoto,
+    List<String>? fotoKeterangan,
     DateTime? createdAt,
   }) {
     return StudentNote(
@@ -53,6 +62,9 @@ class StudentNote {
       deskripsiSTEM: deskripsiSTEM ?? this.deskripsiSTEM,
       nilaiPancasila: nilaiPancasila ?? this.nilaiPancasila,
       deskripsiPancasila: deskripsiPancasila ?? this.deskripsiPancasila,
+      fileDokumen: fileDokumen ?? this.fileDokumen,
+      fileFoto: fileFoto ?? this.fileFoto,
+      fotoKeterangan: fotoKeterangan ?? this.fotoKeterangan,
       createdAt: createdAt ?? this.createdAt,
     );
   }

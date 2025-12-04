@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../models/student_note_model.dart';
 import '../core/theme.dart';
 
@@ -84,6 +85,247 @@ class StudentNoteDetailScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _buildDeskripsiSection('Pancasila', note.deskripsiPancasila),
             const SizedBox(height: 24),
+            // Lampiran Section
+            if (note.fileDokumen.isNotEmpty || note.fileFoto.isNotEmpty) ...[
+              const Text(
+                'Lampiran',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (note.fileDokumen.isNotEmpty) ...[
+                const Text(
+                  'Dokumen',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: note.fileDokumen.length,
+                  itemBuilder: (context, idx) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(6),
+                          color: Colors.grey.shade50,
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.description, color: Colors.blue),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                note.fileDokumen[idx],
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (note.fileFoto.isNotEmpty) ...[
+                const Text(
+                  'Foto/Gambar',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: note.fileFoto.length,
+                  itemBuilder: (context, idx) {
+                    final filePath = note.fileFoto[idx];
+                    final file = File(filePath);
+                    final fileName = filePath.split('/').last;
+                    final fileExists = file.existsSync();
+                    final keterangan = idx < note.fotoKeterangan.length 
+                        ? note.fotoKeterangan[idx] 
+                        : '';
+
+                    return GestureDetector(
+                      onTap: () {
+                        // Show image in fullscreen
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => Dialog(
+                            child: Container(
+                              color: Colors.black,
+                              child: Stack(
+                                children: [
+                                  if (fileExists)
+                                    Center(
+                                      child: Image.file(
+                                        file,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    )
+                                  else
+                                    Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.image_not_supported,
+                                            size: 100,
+                                            color: Colors.white,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Text(
+                                            'Gambar tidak ditemukan',
+                                            style: TextStyle(
+                                              color: Colors.grey.shade400,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  Positioned(
+                                    top: 16,
+                                    right: 16,
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.pop(ctx),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          borderRadius: BorderRadius.circular(50),
+                                        ),
+                                        padding: const EdgeInsets.all(8),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey.shade100,
+                              ),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  if (fileExists)
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: Image.file(
+                                        file,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  else
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.image_not_supported,
+                                          size: 40,
+                                          color: Colors.grey.shade400,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Tidak ada',
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(6),
+                                          bottomRight: Radius.circular(6),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        fileName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (keterangan.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.blue.shade200),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Keterangan:',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    keterangan,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ],
           ],
         ),
       ),
