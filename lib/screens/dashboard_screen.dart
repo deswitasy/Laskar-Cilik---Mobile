@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../core/theme.dart';
-import '../models/student_model.dart';
-import '../widgets/student_card.dart';
-import 'add_student_screen.dart';
-import 'student_detail_screen.dart';
-import '../services/pdf_service.dart';
+import '../models/student_data_model.dart';
+import '../models/student_note_model.dart';
+import '../widgets/student_note_card.dart';
+import 'add_student_note_screen.dart';
+import 'student_note_detail_screen.dart';
+import 'progress_chart_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -15,91 +16,118 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  List<Student> students = [];
-  List<Student> filtered = [];
+  List<StudentData> availableStudents = [];
+  List<StudentNote> notes = [];
+  List<StudentNote> filteredNotes = [];
   final _searchCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // dummy sample data
-    students = List.generate(4, (i) {
-      return Student(
-        id: 's$i',
-        nama: ['Deswita', 'Apriliani', 'Aisyah', 'Nadya'][i],
-        kelas: ['A', 'A', 'B', 'B'][i],
+    _initializeData();
+  }
+
+  void _initializeData() {
+    // Data siswa yang tersedia (dari admin)
+    availableStudents = [
+      StudentData(
+        id: 's0',
+        nama: 'Deswita',
+        kelas: 'A',
         semester: 1,
         tahunAjaran: '2024/2025',
-        nilaiAgama: 'Baik',
-        deskripsiAgama: 'Perkembangan baik.',
-        nilaiJatiDiri: 'Baik',
-        deskripsiJatiDiri: 'Sopan dan tanggung jawab.',
-        nilaiSTEM: 'Baik',
-        deskripsiSTEM: 'Terampil di sains.',
-        nilaiPancasila: 'Cukup',
-        deskripsiPancasila: 'Perlu perbaikan.',
-      );
-    });
-    filtered = List.from(students);
+      ),
+      StudentData(
+        id: 's1',
+        nama: 'Apriliani',
+        kelas: 'A',
+        semester: 1,
+        tahunAjaran: '2024/2025',
+      ),
+      StudentData(
+        id: 's2',
+        nama: 'Aisyah',
+        kelas: 'B',
+        semester: 1,
+        tahunAjaran: '2024/2025',
+      ),
+      StudentData(
+        id: 's3',
+        nama: 'Nadya',
+        kelas: 'B',
+        semester: 1,
+        tahunAjaran: '2024/2025',
+      ),
+    ];
+
+    // Catatan siswa (bisa kosong di awal)
+    notes = [];
+    filteredNotes = List.from(notes);
   }
 
   void _onSearch(String q) {
     final s = q.toLowerCase();
     setState(() {
       if (s.isEmpty) {
-        filtered = List.from(students);
+        filteredNotes = List.from(notes);
       } else {
-        filtered = students
-            .where((st) => st.nama.toLowerCase().contains(s))
+        filteredNotes = notes
+            .where((note) => note.studentName.toLowerCase().contains(s))
             .toList();
       }
     });
   }
 
   Future<void> _goToAdd() async {
-    final result = await Navigator.push<Student?>(
+    final result = await Navigator.push<StudentNote?>(
       context,
-      MaterialPageRoute(builder: (_) => const AddStudentScreen()),
+      MaterialPageRoute(
+        builder: (_) => AddStudentNoteScreen(
+          availableStudents: availableStudents,
+        ),
+      ),
     );
     if (result != null) {
       setState(() {
-        students.insert(0, result);
-        filtered = List.from(students);
+        notes.insert(0, result);
+        filteredNotes = List.from(notes);
       });
     }
   }
 
-  Future<void> _editStudent(Student s, int index) async {
-    final result = await Navigator.push<Student?>(
+  Future<void> _editNote(StudentNote note, int index) async {
+    final result = await Navigator.push<StudentNote?>(
       context,
-      MaterialPageRoute(builder: (_) => AddStudentScreen(student: s)),
+      MaterialPageRoute(
+        builder: (_) => AddStudentNoteScreen(
+          availableStudents: availableStudents,
+          note: note,
+        ),
+      ),
     );
     if (result != null) {
       setState(() {
-        students[index] = result;
-        filtered = List.from(students);
+        notes[index] = result;
+        filteredNotes = List.from(notes);
       });
     }
   }
 
-  void _removeStudent(int index) {
-    final removed = students.removeAt(index);
+  void _removeNote(int index) {
+    final removed = notes.removeAt(index);
     setState(() {
-      filtered = List.from(students);
+      filteredNotes = List.from(notes);
     });
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Terhapus: ${removed.nama}')));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Catatan terhapus: ${removed.studentName}')));
   }
 
-  void _printAll() async {
-    await PdfService.printStudentList(students);
-  }
-
-  void _openDetail(Student s) {
+  void _openDetail(StudentNote note) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => StudentDetailScreen(student: s)),
+      MaterialPageRoute(
+        builder: (_) => StudentNoteDetailScreen(note: note),
+      ),
     );
   }
 
@@ -135,9 +163,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: const Text('Catatan Perkembangan Siswa'),
         actions: [
           IconButton(
-            onPressed: _printAll,
-            icon: const Icon(Icons.print),
-            tooltip: 'Cetak Data',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProgressChartScreen(notes: notes),
+                ),
+              );
+            },
+            icon: const Icon(Icons.bar_chart),
+            tooltip: 'Grafik Perkembangan',
           ),
           IconButton(
             onPressed: _logout,
@@ -179,7 +214,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
-                Text('Jumlah: ${filtered.length}'),
+                Text('Jumlah: ${filteredNotes.length}'),
                 const Spacer(),
                 Text(
                   'Tanggal: $dt',
@@ -190,20 +225,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: filtered.isEmpty
-                ? const Center(child: Text('Tidak ada data'))
+            child: filteredNotes.isEmpty
+                ? const Center(child: Text('Tidak ada catatan'))
                 : ListView.builder(
-                    itemCount: filtered.length,
+                    itemCount: filteredNotes.length,
                     itemBuilder: (context, idx) {
-                      final s = filtered[idx];
-                      final origIndex = students.indexWhere(
-                        (e) => e.id == s.id,
+                      final note = filteredNotes[idx];
+                      final origIndex = notes.indexWhere(
+                        (e) => e.id == note.id,
                       );
-                      return StudentCard(
-                        student: s,
-                        onDetail: () => _openDetail(s),
+                      return StudentNoteCard(
+                        note: note,
+                        onDetail: () => _openDetail(note),
                         onEdit: () =>
-                            _editStudent(s, origIndex < 0 ? idx : origIndex),
+                            _editNote(note, origIndex < 0 ? idx : origIndex),
                         onDelete: () =>
                             _confirmDelete(origIndex < 0 ? idx : origIndex),
                       );
@@ -220,7 +255,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Hapus Data'),
-        content: const Text('Yakin ingin menghapus data Catatan?'),
+        content: const Text('Yakin ingin menghapus catatan ini?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -230,7 +265,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.dangerRed,
             ),
-            onPressed: () => _removeStudent(index),
+            onPressed: () {
+              _removeNote(index);
+              Navigator.pop(ctx);
+            },
             child: const Text('Hapus', style: TextStyle(color: Colors.white)),
           ),
         ],

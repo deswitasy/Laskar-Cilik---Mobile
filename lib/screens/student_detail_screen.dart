@@ -39,7 +39,7 @@ class StudentDetailScreen extends StatelessWidget {
                 _row('Predikat', student.nilaiSTEM),
                 _para(student.deskripsiSTEM),
                 const Divider(),
-                _heading('Manasik'),
+                _heading('Pancasila'),
                 _row('Predikat', student.nilaiPancasila),
                 _para(student.deskripsiPancasila),
                 const Divider(),
@@ -73,8 +73,24 @@ class StudentDetailScreen extends StatelessWidget {
         child: Text(t, style: const TextStyle(fontWeight: FontWeight.bold)),
       );
 
-  Widget _para(String t) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(t.isNotEmpty ? t : '-', style: const TextStyle(color: Colors.black87)),
-      );
+  Widget _para(String t) => Align(
+  alignment: Alignment.centerLeft,
+  child: Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(14),
+    margin: const EdgeInsets.only(bottom: 10),
+    decoration: BoxDecoration(
+      color: Colors.grey.shade100,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade300),
+    ),
+    child: Text(
+      t.isNotEmpty ? t : '-',
+      style: const TextStyle(color: Colors.black87),
+    ),
+  ),
+);
+
+
+
 }

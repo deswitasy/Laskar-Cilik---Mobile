@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'core/theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/admin_dashboard_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -20,6 +21,7 @@ class MainApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const DashboardScreen(),
+        '/admin': (context) => const AdminDashboardScreen(),
       },
     );
   }

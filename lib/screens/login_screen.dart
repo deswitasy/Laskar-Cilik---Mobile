@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,10 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Dummy auth
     if (u == 'guru' && p == '1234') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const DashboardScreen()),
-      );
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else if (u == 'admin' && p == '1234') {
+      Navigator.pushReplacementNamed(context, '/admin');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Username atau password salah')));
     }
@@ -81,7 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     ),
                     const SizedBox(height: 8),
-                    const Text('Gunakan: guru / 1234 (demo)', style: TextStyle(color: Colors.grey)),
+                    const Text('Guru: guru / 1234', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 4),
+                    const Text('Admin: admin / 1234', style: TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ),
